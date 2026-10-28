@@ -15,35 +15,31 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
 
   return (
     <header className="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 text-white shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Left: Brand Logo & Navigation */}
-        <div className="flex items-center space-x-6">
-          <div
-            onClick={() => onViewChange('landing')}
-            className="flex items-center space-x-2.5 cursor-pointer select-none"
-          >
-            <div className="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-600/30">
-              ZD
-            </div>
-            <div>
-              <div className="text-sm font-bold tracking-tight text-white flex items-center space-x-1.5">
-                <span>Zendesk–Darwinbox–Box</span>
-                <span className="hidden sm:inline-block text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  Enterprise
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">Automated Support Orchestrator</p>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+        {/* Left: Brand Logo & Title */}
+        <div
+          onClick={() => onViewChange('landing')}
+          className="flex items-center space-x-2.5 cursor-pointer select-none shrink-0"
+        >
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-700 to-indigo-500 flex items-center justify-center text-white font-black text-sm shadow-md shadow-indigo-600/30">
+            ZD
           </div>
+          <div>
+            <div className="text-sm font-bold tracking-tight text-white flex items-center space-x-1.5 whitespace-nowrap">
+              <span>Zendesk Automation</span>
+              <span className="hidden sm:inline-block text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                Enterprise
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 hidden xl:block whitespace-nowrap">
+              Darwinbox & Box Cloud Orchestrator
+            </p>
+          </div>
+        </div>
 
-          {/* Nav links */}
-          <nav className="hidden lg:flex items-center space-x-5 text-xs font-semibold text-slate-300">
-            <button
-              onClick={() => onViewChange('landing')}
-              className={`hover:text-white transition-colors ${activeView === 'landing' ? 'text-indigo-400' : ''}`}
-            >
-              Overview
-            </button>
+        {/* Center: In-page Section Anchor Links (Shown on wide screens when on landing page) */}
+        {activeView === 'landing' && (
+          <nav className="hidden 2xl:flex items-center space-x-5 text-xs font-medium text-slate-300">
             <a href="#features" className="hover:text-white transition-colors">
               Capabilities
             </a>
@@ -53,32 +49,54 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
             <a href="#pricing" className="hover:text-white transition-colors">
               Pricing
             </a>
+          </nav>
+        )}
+
+        {/* Right Actions: Segmented View Switcher, Live Sync, RBAC Role, Simulate */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
+          {/* Segmented View Switcher (Overview | Workspace | Docs) */}
+          <div className="flex bg-slate-800/90 p-1 rounded-xl border border-slate-700/80 text-xs font-medium shrink-0">
+            <button
+              onClick={() => onViewChange('landing')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+                activeView === 'landing'
+                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+              }`}
+              title="Overview & Landing Page"
+            >
+              <Home className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden md:inline whitespace-nowrap">Overview</span>
+            </button>
             <button
               onClick={() => onViewChange('workspace')}
-              className={`flex items-center space-x-1 hover:text-white transition-colors ${
-                activeView === 'workspace' ? 'text-indigo-400' : ''
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+                activeView === 'workspace'
+                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
+              title="Deep Analysis Live Workspace"
             >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Workspace</span>
+              <LayoutDashboard className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden md:inline whitespace-nowrap">Workspace</span>
             </button>
             <button
               onClick={() => onViewChange('docs')}
-              className={`flex items-center space-x-1 hover:text-white transition-colors ${
-                activeView === 'docs' ? 'text-indigo-400' : ''
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center space-x-1.5 ${
+                activeView === 'docs'
+                  ? 'bg-indigo-600 text-white font-semibold shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
               }`}
+              title="Architecture Docs & Legal Specs"
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Docs & Specs</span>
+              <BookOpen className="w-3.5 h-3.5 shrink-0" />
+              <span className="hidden md:inline whitespace-nowrap">Docs</span>
             </button>
-          </nav>
-        </div>
+          </div>
 
-        {/* Right Actions: WebSocket Status, View Toggle, Role Switcher, Simulate */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Real-time WebSocket Connectivity Badge */}
+          {/* WebSocket Connectivity Status Badge */}
           <div
-            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
+            className={`flex items-center space-x-1.5 px-2 py-1 rounded-lg text-xs font-medium border shrink-0 transition-colors ${
               isConnected
                 ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
                 : 'bg-amber-950/60 text-amber-300 border-amber-800'
@@ -87,59 +105,25 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
           >
             {isConnected ? (
               <>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <Wifi className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="hidden xl:inline font-mono text-[11px]">Live Sync</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <Wifi className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="hidden lg:inline font-mono text-[11px] whitespace-nowrap">Live Sync</span>
               </>
             ) : (
               <>
-                <WifiOff className="w-3.5 h-3.5 text-amber-400 animate-spin" />
-                <span className="hidden xl:inline font-mono text-[11px]">Connecting</span>
+                <WifiOff className="w-3.5 h-3.5 text-amber-400 animate-spin shrink-0" />
+                <span className="hidden lg:inline font-mono text-[11px] whitespace-nowrap">Connecting</span>
               </>
             )}
           </div>
 
-          {/* View Toggle: Landing vs Workspace vs Docs */}
-          <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-xs font-semibold">
-            <button
-              onClick={() => onViewChange('landing')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
-                activeView === 'landing' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="View SaaS Landing Page"
-            >
-              <Home className="w-3 h-3" />
-              <span className="hidden sm:inline">Overview</span>
-            </button>
-            <button
-              onClick={() => onViewChange('workspace')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
-                activeView === 'workspace' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Open Deep Analysis Workspace"
-            >
-              <LayoutDashboard className="w-3 h-3" />
-              <span className="hidden sm:inline">Workspace</span>
-            </button>
-            <button
-              onClick={() => onViewChange('docs')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
-                activeView === 'docs' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
-              title="Architecture Docs & Legal Specs"
-            >
-              <BookOpen className="w-3 h-3" />
-              <span className="hidden sm:inline">Docs</span>
-            </button>
-          </div>
-
-          {/* Interactive Role Switcher (RBAC Context) */}
-          <div className="flex items-center space-x-1 bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs">
-            <Shield className="w-3.5 h-3.5 text-slate-400 ml-1" />
+          {/* RBAC Role Selector Dropdown */}
+          <div className="flex items-center space-x-1 bg-slate-800/90 py-1 px-1.5 rounded-xl border border-slate-700/80 text-xs shrink-0">
+            <Shield className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
-              className="bg-slate-900 text-slate-200 text-xs font-semibold py-1 px-1.5 rounded border border-slate-700 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+              className="bg-slate-900 text-slate-200 text-xs font-semibold py-0.5 px-1 rounded-md border border-slate-700 shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="admin">Admin</option>
               <option value="approver">Approver</option>
@@ -147,16 +131,16 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
             </select>
           </div>
 
-          {/* Simulate Inbound Webhook Button (Gated to Admin only via PermissionGuard) */}
+          {/* Simulate Action Button (Gated to Admin only via PermissionGuard) */}
           <PermissionGuard
             permission="canSimulate"
             fallback={null}
           >
             <button
               onClick={onOpenSimulate}
-              className="hidden md:flex items-center space-x-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm active:scale-95"
+              className="flex items-center space-x-1 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/30 active:scale-95 shrink-0 whitespace-nowrap"
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
               <span>Simulate</span>
             </button>
           </PermissionGuard>
