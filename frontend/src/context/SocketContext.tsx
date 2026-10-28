@@ -16,12 +16,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    // Determine backend URL from env or fallback
+    // Determine backend URL from env or fallback to deployed Render backend
     const backendUrl =
       import.meta.env.VITE_BACKEND_URL ||
       (typeof window !== 'undefined' && window.location.hostname === 'localhost'
         ? 'http://localhost:5000'
-        : 'https://zendesk-darwinbox-box-automation.onrender.com');
+        : 'https://zendesk-redj.onrender.com');
 
     // Connect to backend WebSocket server
     const socketInstance = io(backendUrl, {

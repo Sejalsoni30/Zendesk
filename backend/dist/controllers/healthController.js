@@ -3,7 +3,8 @@ import { checkFirestoreConnection } from '../config/firebase.js';
 export async function getHealth(_req, res) {
     const isFirestoreConnected = await checkFirestoreConnection();
     const status = isFirestoreConnected ? 'healthy' : 'degraded';
-    res.status(isFirestoreConnected ? 200 : 503).json({
+    const statusCode = isFirestoreConnected || config.USE_MOCK_SERVICES ? 200 : 503;
+    res.status(statusCode).json({
         status,
         timestamp: new Date().toISOString(),
         uptime: Math.floor(process.uptime()),

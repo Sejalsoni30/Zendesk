@@ -6,8 +6,9 @@ export async function getHealth(_req: Request, res: Response): Promise<void> {
   const isFirestoreConnected = await checkFirestoreConnection();
 
   const status = isFirestoreConnected ? 'healthy' : 'degraded';
+  const statusCode = isFirestoreConnected || config.USE_MOCK_SERVICES ? 200 : 503;
 
-  res.status(isFirestoreConnected ? 200 : 503).json({
+  res.status(statusCode).json({
     status,
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()),
