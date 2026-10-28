@@ -33,10 +33,11 @@ export class AuditLogRepository {
       return id;
     }
 
+    let timer: NodeJS.Timeout;
     try {
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200)
-      );
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200);
+      });
 
       const addPromise = this.collection.add({
         ...entry,
@@ -49,6 +50,8 @@ export class AuditLogRepository {
     } catch {
       this.useMemoryFallback = true;
       return this.append(entry);
+    } finally {
+      clearTimeout(timer!);
     }
   }
 

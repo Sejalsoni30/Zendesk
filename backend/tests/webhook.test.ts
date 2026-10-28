@@ -44,9 +44,10 @@ describe('Zendesk Webhook & Integration Pipeline Tests', () => {
   });
 
   it('should accept valid webhook signature with 202 Accepted and idempotent key', async () => {
+    const uniqueKey = `evt_zd_test_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
     const payloadObj = {
       event: 'ticket.created',
-      idempotency_key: 'evt_zd_test_1099',
+      idempotency_key: uniqueKey,
       ticket: {
         id: 'ZD-1099',
         subject: 'Dev Equipment Provisioning',
@@ -71,7 +72,7 @@ describe('Zendesk Webhook & Integration Pipeline Tests', () => {
       .send(rawPayload);
 
     expect(res.status).toBe(202);
-    expect(res.body.idempotencyKey).toBe('evt_zd_test_1099');
+    expect(res.body.idempotencyKey).toBe(uniqueKey);
     expect(res.body.ticketId).toBe('ZD-1099');
     expect(res.body.isDuplicate).toBe(false);
   });
@@ -116,3 +117,4 @@ describe('Zendesk Webhook & Integration Pipeline Tests', () => {
     expect(conflictResult.isExisting).toBe(true);
   });
 });
+

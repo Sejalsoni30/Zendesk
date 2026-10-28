@@ -40,11 +40,12 @@ export class TicketMappingRepository {
       return doc;
     }
 
+    let timer: NodeJS.Timeout;
     try {
       const docRef = this.collection.doc(ticketId);
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200)
-      );
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200);
+      });
 
       await Promise.race([
         docRef.set({
@@ -60,6 +61,8 @@ export class TicketMappingRepository {
       this.useMemoryFallback = true;
       this.memoryMappings.set(ticketId, doc);
       return doc;
+    } finally {
+      clearTimeout(timer!);
     }
   }
 

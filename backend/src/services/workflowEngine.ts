@@ -7,6 +7,7 @@ import { darwinboxService, boxService, zendeskService } from './index.js';
 import { WORKFLOW_STATES } from '../stateMachine/states.js';
 import { WORKFLOW_STEPS } from '../stateMachine/steps.js';
 import { ZendeskWebhookPayload } from '../schemas/webhookPayload.js';
+import { withExponentialBackoff } from '../utils/retry.js';
 
 export class WorkflowEngine {
   private workerId: string;
@@ -39,6 +40,7 @@ export class WorkflowEngine {
     const { doc, isNew } = await workflowRepository.createIfAbsent(idempotencyKey, {
       idempotencyKey,
       ticketId,
+      employeeId: rawEmployeeId,
       subject: payload.ticket.subject,
       category: payload.ticket.category,
       priority: payload.ticket.priority,
@@ -113,7 +115,11 @@ export class WorkflowEngine {
     }
 
     const ticketId = doc.ticketId;
-    const employeeId = rawEmployeeId || doc.stepResults?.employeeVerification?.employeeId || `EMP-${ticketId}`;
+    const employeeId =
+      doc.employeeId ||
+      rawEmployeeId ||
+      doc.stepResults?.employeeVerification?.employeeId ||
+      `EMP-${ticketId}`;
 
     try {
       // -------------------------------------------------------------
@@ -122,7 +128,10 @@ export class WorkflowEngine {
       if (!doc.stepResults?.employeeVerification) {
         await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.VERIFYING_EMPLOYEE);
 
-        const verification = await darwinboxService.verifyEmployee(employeeId);
+        const verification = await withExponentialBackoff(
+          () => darwinboxService.verifyEmployee(employeeId),
+          { maxRetries: 2, initialDelayMs: 50 }
+        );
 
         if (!verification.verified || verification.status !== 'ACTIVE') {
           const errorCode = verification.status === 'NOT_FOUND' ? 'ERR_EMPLOYEE_NOT_FOUND' : 'ERR_EMPLOYEE_INACTIVE';
@@ -192,14 +201,18 @@ export class WorkflowEngine {
         await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.RESOLVING_BOX_FOLDER);
 
         const empName = doc.stepResults?.employeeVerification?.name || 'Employee';
-        boxResult = await boxService.provisionCaseFolder({
-          ticketId,
-          employeeId,
-          employeeName: empName,
-          collaborators: [
-            { email: config.ZENDESK_ADMIN_EMAIL, role: 'editor' },
-          ],
-        });
+        boxResult = await withExponentialBackoff(
+          () =>
+            boxService.provisionCaseFolder({
+              ticketId,
+              employeeId,
+              employeeName: empName,
+              collaborators: [
+                { email: config.ZENDESK_ADMIN_EMAIL, role: 'editor' },
+              ],
+            }),
+          { maxRetries: 2, initialDelayMs: 50 }
+        );
 
         await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.RESOLVING_BOX_FOLDER, {
           boxFolder: boxResult,
@@ -233,11 +246,15 @@ export class WorkflowEngine {
       if (config.ZENDESK_WRITEBACK_ENABLED && !doc.stepResults?.zendeskUpdate) {
         await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.UPDATING_ZENDESK);
 
-        const updateResult = await zendeskService.updateTicket(ticketId, {
-          comment: `[Automation] HR Case Folder provisioned: ${boxResult.folderUrl}`,
-          status: 'pending',
-          tags: ['automated_box_provisioned', `cat_${doc.category.toLowerCase()}`],
-        });
+        const updateResult = await withExponentialBackoff(
+          () =>
+            zendeskService.updateTicket(ticketId, {
+              comment: `[Automation] HR Case Folder provisioned: ${boxResult.folderUrl}`,
+              status: 'pending',
+              tags: ['automated_box_provisioned', `cat_${doc.category.toLowerCase()}`],
+            }),
+          { maxRetries: 2, initialDelayMs: 50 }
+        );
 
         await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.UPDATING_ZENDESK, {
           zendeskUpdate: updateResult,
@@ -343,6 +360,33 @@ export class WorkflowEngine {
       metadata: { approver: approverEmail, reason },
     });
   }
+
+  /**
+   * Retries a failed workflow. Resumes safely from currentStep without repeating completed side effects.
+   */
+  async retryWorkflow(idempotencyKey: string): Promise<void> {
+    const doc = await workflowRepository.getById(idempotencyKey);
+    if (!doc) {
+      throw new Error(`Workflow ${idempotencyKey} not found`);
+    }
+
+    if (doc.status !== WORKFLOW_STATES.FAILED) {
+      throw new Error(`Only failed workflows can be retried. Current status is ${doc.status}`);
+    }
+
+    await auditLogRepository.append({
+      workflowId: idempotencyKey,
+      ticketId: doc.ticketId,
+      actor: 'admin@example.com',
+      action: 'WORKFLOW_RETRY_INITIATED',
+      result: 'SUCCESS',
+      metadata: { resumeFromStep: doc.currentStep },
+    });
+
+    // Process workflow claims lease and transitions FAILED -> PROCESSING
+    await this.processWorkflow(idempotencyKey);
+  }
 }
 
 export const workflowEngine = new WorkflowEngine();
+

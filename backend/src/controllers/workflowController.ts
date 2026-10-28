@@ -55,3 +55,14 @@ export async function rejectWorkflow(req: Request, res: Response): Promise<void>
     res.status(400).json({ error: err.message, code: 'ERR_REJECTION_FAILED' });
   }
 }
+
+export async function retryWorkflow(req: Request, res: Response): Promise<void> {
+  const id = String(req.params.id);
+
+  try {
+    await workflowEngine.retryWorkflow(id);
+    res.json({ message: `Workflow ${id} retry initiated`, status: 'processing' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message, code: 'ERR_RETRY_FAILED' });
+  }
+}

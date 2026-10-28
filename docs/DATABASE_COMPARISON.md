@@ -102,3 +102,4 @@ export const AuditLogModel = mongoose.model('AuditLog', AuditLogSchema);
 
 3. **"How do you prevent duplicate side effects on retries?"**:
    > *"We track `currentStep` and write granular `stepResults` to Firestore at every milestone (e.g. `boxFolderId`). If a downstream step fails (e.g. Zendesk network timeout), the retry mechanism inspects `stepResults`. Because the Box folder ID is already persisted, the engine skips folder creation and resumes directly from the Zendesk writeback step, guaranteeing idempotent execution."*
+

@@ -33,3 +33,4 @@ export async function handleZendeskWebhook(req: Request, res: Response): Promise
     timestamp: new Date().toISOString(),
   });
 }
+

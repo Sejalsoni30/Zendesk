@@ -20,3 +20,4 @@ export const zendeskTicketWebhookSchema = z.object({
 });
 
 export type ZendeskWebhookPayload = z.infer<typeof zendeskTicketWebhookSchema>;
+

@@ -1,0 +1,64 @@
+{
+  "evaluatedAt": "2026-10-28T17:18:41.356Z",
+  "totalScenarios": 5,
+  "passedScenarios": 5,
+  "successRatePct": 100,
+  "avgProcessingTimeMs": 434,
+  "avgProcessingTimeSec": "0.43",
+  "totalManualMinutesSaved": 40,
+  "totalStepsAvoided": 20,
+  "duplicateSideEffects": 0,
+  "scenarios": [
+    {
+      "scenarioName": "Standard Equipment Ticket (Auto-Provisioned)",
+      "automatedResult": "PASSED",
+      "executionTimeMs": 1213,
+      "duplicateSideEffects": 0,
+      "manualStepsAvoided": 5,
+      "manualEstimatedMinutes": 10.5,
+      "notes": "Completed Darwinbox check + Box folder + Zendesk writeback autonomously."
+    },
+    {
+      "scenarioName": "Duplicate Webhook Delivery Suppression",
+      "automatedResult": "PASSED",
+      "executionTimeMs": 272,
+      "duplicateSideEffects": 0,
+      "manualStepsAvoided": 3,
+      "manualEstimatedMinutes": 5,
+      "notes": "Atomically prevented duplicate Box folder and duplicate ticket comments."
+    },
+    {
+      "scenarioName": "Sensitive Category (HR_ACCESS Human-in-the-Loop)",
+      "automatedResult": "PASSED",
+      "executionTimeMs": 287,
+      "duplicateSideEffects": 0,
+      "manualStepsAvoided": 4,
+      "manualEstimatedMinutes": 8,
+      "notes": "Halted safely in needs_approval until authorized by HR Approver."
+    },
+    {
+      "scenarioName": "Terminated Employee Access Request Blocked",
+      "automatedResult": "PASSED",
+      "executionTimeMs": 112,
+      "duplicateSideEffects": 0,
+      "manualStepsAvoided": 3,
+      "manualEstimatedMinutes": 4.5,
+      "notes": "Darwinbox verification correctly flagged terminated status; halted pipeline."
+    },
+    {
+      "scenarioName": "Transient Cloud 503 Retry Recovery",
+      "automatedResult": "PASSED",
+      "executionTimeMs": 284,
+      "duplicateSideEffects": 0,
+      "manualStepsAvoided": 5,
+      "manualEstimatedMinutes": 12,
+      "notes": "Box returned 503; recovered automatically with jittered exponential backoff."
+    }
+  ],
+  "baselineAssumptions": {
+    "manualMinutesPerTicket": 10.5,
+    "darwinboxVerificationTimeMin": 3.5,
+    "boxFolderCreationTimeMin": 4.5,
+    "zendeskUpdateWritebackMin": 2.5
+  }
+}

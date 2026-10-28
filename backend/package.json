@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
     "seed": "tsx src/scripts/seed.ts",
+    "evaluate": "tsx src/scripts/evaluate.ts",
     "smoke-test": "tsx tests/smoke.ts"
   },
   "dependencies": {

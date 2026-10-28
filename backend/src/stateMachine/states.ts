@@ -7,3 +7,4 @@ export const WORKFLOW_STATES = {
 } as const;
 
 export type WorkflowState = typeof WORKFLOW_STATES[keyof typeof WORKFLOW_STATES];
+

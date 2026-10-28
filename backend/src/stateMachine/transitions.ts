@@ -46,3 +46,4 @@ export function validateTransition(from: WorkflowState, to: WorkflowState): void
     throw new InvalidStateTransitionError(from, to);
   }
 }
+

@@ -6,6 +6,7 @@ import { validateTransition } from '../stateMachine/transitions.js';
 export interface WorkflowRunDocument {
   idempotencyKey: string;
   ticketId: string;
+  employeeId?: string;
   subject: string;
   category: string;
   priority: string;
@@ -66,11 +67,12 @@ export class WorkflowRepository {
       return { doc: newDoc, isNew: true };
     }
 
+    let timer: NodeJS.Timeout;
     try {
       const docRef = this.collection.doc(idempotencyKey);
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200)
-      );
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200);
+      });
 
       return await Promise.race([
         db.runTransaction(async (transaction) => {
@@ -108,6 +110,8 @@ export class WorkflowRepository {
       // If Firestore emulator is unreachable or timed out, gracefully fallback to in-memory store
       this.useMemoryFallback = true;
       return this.createIfAbsent(idempotencyKey, initialData);
+    } finally {
+      clearTimeout(timer!);
     }
   }
 
@@ -148,11 +152,12 @@ export class WorkflowRepository {
       return { acquired: true, doc: data };
     }
 
+    let timer: NodeJS.Timeout;
     try {
       const docRef = this.collection.doc(idempotencyKey);
-      const timeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200)
-      );
+      const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error('FIRESTORE_TIMEOUT')), 1200);
+      });
 
       return await Promise.race([
         db.runTransaction(async (transaction) => {
@@ -203,6 +208,8 @@ export class WorkflowRepository {
     } catch (err: any) {
       this.useMemoryFallback = true;
       return this.acquireLease(idempotencyKey, workerId, leaseSeconds);
+    } finally {
+      clearTimeout(timer!);
     }
   }
 
@@ -267,6 +274,10 @@ export class WorkflowRepository {
         current.leaseOwner = null;
         current.leaseExpiresAt = null;
       }
+      if (targetState === WORKFLOW_STATES.FAILED || targetState === WORKFLOW_STATES.NEEDS_APPROVAL) {
+        current.leaseOwner = null;
+        current.leaseExpiresAt = null;
+      }
       return;
     }
 
@@ -290,6 +301,10 @@ export class WorkflowRepository {
 
         if (targetState === WORKFLOW_STATES.COMPLETED) {
           updates.completedAt = FieldValue.serverTimestamp();
+          updates.leaseOwner = null;
+          updates.leaseExpiresAt = null;
+        }
+        if (targetState === WORKFLOW_STATES.FAILED || targetState === WORKFLOW_STATES.NEEDS_APPROVAL) {
           updates.leaseOwner = null;
           updates.leaseExpiresAt = null;
         }
