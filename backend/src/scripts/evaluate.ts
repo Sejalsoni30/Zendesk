@@ -68,6 +68,7 @@ async function runEvaluationBenchmark() {
         subject: 'Engineering Workstation Request',
         category: 'EQUIPMENT',
         priority: 'normal',
+        status: 'new',
         requester: { employee_id: 'EMP-1001', name: 'Aarav Sharma' },
       },
     });
@@ -100,6 +101,8 @@ async function runEvaluationBenchmark() {
         id: `EV-102`,
         subject: 'Keyboard replacement',
         category: 'EQUIPMENT',
+        priority: 'normal',
+        status: 'new',
         requester: { employee_id: 'EMP-1001' },
       },
     });
@@ -113,6 +116,8 @@ async function runEvaluationBenchmark() {
         id: `EV-102`,
         subject: 'Keyboard replacement',
         category: 'EQUIPMENT',
+        priority: 'normal',
+        status: 'new',
         requester: { employee_id: 'EMP-1001' },
       },
     });
@@ -143,6 +148,7 @@ async function runEvaluationBenchmark() {
         subject: 'Confidential Payroll Audit',
         category: 'HR_ACCESS',
         priority: 'high',
+        status: 'new',
         requester: { employee_id: 'EMP-1002', name: 'Sejal Patel' },
       },
     });
@@ -176,6 +182,8 @@ async function runEvaluationBenchmark() {
         id: `EV-104`,
         subject: 'VPN access request',
         category: 'EQUIPMENT',
+        priority: 'high',
+        status: 'new',
         requester: { employee_id: 'EMP-9999' },
       },
     });
@@ -208,6 +216,8 @@ async function runEvaluationBenchmark() {
         id: `EV-105`,
         subject: 'Transient cloud blip test',
         category: 'EQUIPMENT',
+        priority: 'normal',
+        status: 'new',
         requester: { employee_id: 'EMP-1001' },
       },
     });

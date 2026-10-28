@@ -8,6 +8,7 @@ import { WORKFLOW_STATES } from '../stateMachine/states.js';
 import { WORKFLOW_STEPS } from '../stateMachine/steps.js';
 import { ZendeskWebhookPayload } from '../schemas/webhookPayload.js';
 import { withExponentialBackoff } from '../utils/retry.js';
+import { broadcastEvent } from '../socket.js';
 
 export class WorkflowEngine {
   private workerId: string;
@@ -85,6 +86,19 @@ export class WorkflowEngine {
       },
     });
 
+    broadcastEvent('ticket:created', {
+      idempotencyKey,
+      ticketId,
+      subject: payload.ticket.subject,
+      category: payload.ticket.category,
+      priority: payload.ticket.priority,
+      employeeId: rawEmployeeId,
+      status: WORKFLOW_STATES.RECEIVED,
+      currentStep: WORKFLOW_STEPS.WEBHOOK_RECEIVED,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
     // Asynchronously begin pipeline processing
     setImmediate(() => {
       this.processWorkflow(idempotencyKey, rawEmployeeId).catch((err) => {
@@ -142,6 +156,15 @@ export class WorkflowEngine {
             errorMessage: errorMsg,
           });
 
+          broadcastEvent('ticket:updated', {
+            idempotencyKey,
+            ticketId,
+            status: WORKFLOW_STATES.FAILED,
+            errorCode,
+            errorMessage: errorMsg,
+            currentStep: WORKFLOW_STEPS.VERIFYING_EMPLOYEE,
+          });
+
           await auditLogRepository.append({
             workflowId: idempotencyKey,
             ticketId,
@@ -178,6 +201,14 @@ export class WorkflowEngine {
       if (doc.requiresApproval && !doc.approvedBy) {
         await workflowRepository.transitionState(idempotencyKey, WORKFLOW_STATES.NEEDS_APPROVAL);
         await workflowRepository.releaseLease(idempotencyKey);
+
+        broadcastEvent('ticket:updated', {
+          idempotencyKey,
+          ticketId,
+          status: WORKFLOW_STATES.NEEDS_APPROVAL,
+          currentStep: WORKFLOW_STEPS.VERIFYING_EMPLOYEE,
+          requiresApproval: true,
+        });
 
         await auditLogRepository.append({
           workflowId: idempotencyKey,
@@ -275,6 +306,15 @@ export class WorkflowEngine {
       // -------------------------------------------------------------
       await workflowRepository.recordStepProgress(idempotencyKey, WORKFLOW_STEPS.FINALIZING);
       await workflowRepository.transitionState(idempotencyKey, WORKFLOW_STATES.COMPLETED);
+
+      broadcastEvent('ticket:completed', {
+        idempotencyKey,
+        ticketId,
+        status: WORKFLOW_STATES.COMPLETED,
+        currentStep: WORKFLOW_STEPS.FINALIZING,
+        boxFolderId: boxResult?.folderId,
+        boxFolderUrl: boxResult?.folderUrl,
+      });
 
       await auditLogRepository.append({
         workflowId: idempotencyKey,
