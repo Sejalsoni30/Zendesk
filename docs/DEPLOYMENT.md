@@ -89,3 +89,4 @@ Once deployed, point your Zendesk Webhook trigger to your deployed endpoint:
 - [ ] Open Workspace: Simulate an inbound webhook event (`ZD-9001`) and verify instant real-time table update.
 - [ ] Inspect modal: Verify Process Timeline, Zendesk Payload, and Audit Logs tabs render correctly.
 - [ ] Role switcher test: Verify that switching to `Viewer` disables action buttons.
+

@@ -36,3 +36,4 @@ services:
           type: web
           name: zendesk-automation-backend
           property: host
+
