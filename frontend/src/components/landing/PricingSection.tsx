@@ -129,3 +129,4 @@ export function PricingSection({ onOpenWorkspace }: PricingSectionProps) {
     </section>
   );
 }
+

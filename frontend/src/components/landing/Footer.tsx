@@ -1,8 +1,19 @@
+import { FooterDocTopic } from '../pages/FooterDocPage';
+
 interface FooterProps {
   onOpenWorkspace: () => void;
+  onOpenDocTopic?: (topic: FooterDocTopic) => void;
 }
 
-export function Footer({ onOpenWorkspace }: FooterProps) {
+export function Footer({ onOpenWorkspace, onOpenDocTopic }: FooterProps) {
+  const handleDocClick = (topic: FooterDocTopic) => {
+    if (onOpenDocTopic) {
+      onOpenDocTopic(topic);
+    } else {
+      onOpenWorkspace();
+    }
+  };
+
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -10,7 +21,7 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
           {/* Brand Info */}
           <div className="md:col-span-2">
             <div className="flex items-center space-x-2.5 text-white font-bold text-base mb-3">
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs">
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs shadow-md shadow-indigo-600/30">
                 ZD
               </div>
               <span>Zendesk–Darwinbox–Box Automation</span>
@@ -24,12 +35,12 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
             </div>
           </div>
 
-          {/* Links Column 1 */}
+          {/* Links Column 1: Platform */}
           <div>
             <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">Platform</h5>
             <ul className="space-y-2.5">
               <li>
-                <button onClick={onOpenWorkspace} className="hover:text-white transition-colors">
+                <button onClick={onOpenWorkspace} className="hover:text-white transition-colors text-left">
                   Interactive Workspace
                 </button>
               </li>
@@ -51,29 +62,41 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
             </ul>
           </div>
 
-          {/* Links Column 2 */}
+          {/* Links Column 2: Architecture & Engineering Docs */}
           <div>
             <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-4">Architecture & Docs</h5>
             <ul className="space-y-2.5">
               <li>
-                <span className="hover:text-white cursor-pointer transition-colors">
+                <button
+                  onClick={() => handleDocClick('zendesk-hmac')}
+                  className="hover:text-indigo-400 text-slate-400 cursor-pointer transition-colors text-left"
+                >
                   Zendesk HMAC Webhooks
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-white cursor-pointer transition-colors">
+                <button
+                  onClick={() => handleDocClick('darwinbox-oauth')}
+                  className="hover:text-indigo-400 text-slate-400 cursor-pointer transition-colors text-left"
+                >
                   Darwinbox OAuth2 Token Cache
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-white cursor-pointer transition-colors">
+                <button
+                  onClick={() => handleDocClick('box-conflict')}
+                  className="hover:text-indigo-400 text-slate-400 cursor-pointer transition-colors text-left"
+                >
                   Box Conflict Prevention
-                </span>
+                </button>
               </li>
               <li>
-                <span className="hover:text-white cursor-pointer transition-colors">
+                <button
+                  onClick={() => handleDocClick('firestore-leases')}
+                  className="hover:text-indigo-400 text-slate-400 cursor-pointer transition-colors text-left"
+                >
                   Firestore Lease Locking
-                </span>
+                </button>
               </li>
             </ul>
           </div>
@@ -84,7 +107,7 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
             <p className="text-[11px] text-slate-400 mb-3">
               Receive updates on enterprise compliance, SOC2 automation, and security audits.
             </p>
-            <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed for updates!'); }} className="space-y-2">
+            <form onSubmit={(e) => { e.preventDefault(); alert('Subscribed for compliance and release notes!'); }} className="space-y-2">
               <div className="relative">
                 <input
                   type="email"
@@ -95,7 +118,7 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
               </div>
               <button
                 type="submit"
-                className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs transition-colors"
+                className="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs transition-colors shadow-md shadow-indigo-600/20"
               >
                 Subscribe
               </button>
@@ -103,13 +126,28 @@ export function Footer({ onOpenWorkspace }: FooterProps) {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar: Legal & Compliance */}
         <div className="mt-12 pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
           <p>© 2026 Zendesk–Darwinbox–Box Support Workflow Automation Engine. All rights reserved.</p>
           <div className="flex items-center space-x-6">
-            <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-slate-400 cursor-pointer">GDPR Commitment</span>
+            <button
+              onClick={() => handleDocClick('privacy-policy')}
+              className="hover:text-indigo-400 cursor-pointer transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button
+              onClick={() => handleDocClick('terms-of-service')}
+              className="hover:text-indigo-400 cursor-pointer transition-colors"
+            >
+              Terms of Service
+            </button>
+            <button
+              onClick={() => handleDocClick('gdpr-commitment')}
+              className="hover:text-indigo-400 cursor-pointer transition-colors"
+            >
+              GDPR Commitment
+            </button>
           </div>
         </div>
       </div>

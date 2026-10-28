@@ -1,11 +1,11 @@
-import { Shield, Sparkles, Wifi, WifiOff, LayoutDashboard, Home } from 'lucide-react';
+import { Shield, Sparkles, Wifi, WifiOff, LayoutDashboard, Home, BookOpen } from 'lucide-react';
 import { useRbac, PermissionGuard } from '../../context/RbacContext';
 import { useSocket } from '../../context/SocketContext';
 import { UserRole } from '../../types/workflow';
 
 interface NavbarProps {
-  activeView: 'landing' | 'workspace';
-  onViewChange: (view: 'landing' | 'workspace') => void;
+  activeView: 'landing' | 'workspace' | 'docs';
+  onViewChange: (view: 'landing' | 'workspace' | 'docs') => void;
   onOpenSimulate: () => void;
 }
 
@@ -60,7 +60,16 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
               }`}
             >
               <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>Deep Analysis Workspace</span>
+              <span>Workspace</span>
+            </button>
+            <button
+              onClick={() => onViewChange('docs')}
+              className={`flex items-center space-x-1 hover:text-white transition-colors ${
+                activeView === 'docs' ? 'text-indigo-400' : ''
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Docs & Specs</span>
             </button>
           </nav>
         </div>
@@ -90,7 +99,7 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
             )}
           </div>
 
-          {/* View Toggle: Landing vs Workspace */}
+          {/* View Toggle: Landing vs Workspace vs Docs */}
           <div className="flex bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-xs font-semibold">
             <button
               onClick={() => onViewChange('landing')}
@@ -110,7 +119,17 @@ export function Navbar({ activeView, onViewChange, onOpenSimulate }: NavbarProps
               title="Open Deep Analysis Workspace"
             >
               <LayoutDashboard className="w-3 h-3" />
-              <span>Workspace</span>
+              <span className="hidden sm:inline">Workspace</span>
+            </button>
+            <button
+              onClick={() => onViewChange('docs')}
+              className={`px-2.5 py-1 rounded-md transition-all flex items-center space-x-1 ${
+                activeView === 'docs' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+              }`}
+              title="Architecture Docs & Legal Specs"
+            >
+              <BookOpen className="w-3 h-3" />
+              <span className="hidden sm:inline">Docs</span>
             </button>
           </div>
 

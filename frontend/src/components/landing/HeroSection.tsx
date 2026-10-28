@@ -132,3 +132,4 @@ export function HeroSection({ onOpenWorkspace, onExploreFeatures }: HeroSectionP
     </section>
   );
 }
+

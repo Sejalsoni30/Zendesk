@@ -11,12 +11,14 @@ import { Footer } from './components/landing/Footer';
 import { WorkspaceSection } from './components/dashboard/WorkspaceSection';
 import { WorkflowDetailModal } from './components/dashboard/WorkflowDetailModal';
 import { SimulateWebhookModal } from './components/dashboard/SimulateWebhookModal';
+import { FooterDocPage, FooterDocTopic } from './components/pages/FooterDocPage';
 import { INITIAL_TICKETS } from './data/mockData';
 import { WorkflowTicket } from './types/workflow';
 import { CheckCircle2 } from 'lucide-react';
 
 function MainApp() {
-  const [activeView, setActiveView] = useState<'landing' | 'workspace'>('landing');
+  const [activeView, setActiveView] = useState<'landing' | 'workspace' | 'docs'>('landing');
+  const [activeDocTopic, setActiveDocTopic] = useState<FooterDocTopic>('zendesk-hmac');
   const [tickets, setTickets] = useState<WorkflowTicket[]>(INITIAL_TICKETS);
   const [selectedTicket, setSelectedTicket] = useState<WorkflowTicket | null>(null);
   const [isSimulateOpen, setIsSimulateOpen] = useState(false);
@@ -24,6 +26,11 @@ function MainApp() {
 
   const { role, hasPermission } = useRbac();
   const { socket } = useSocket();
+
+  const handleOpenDocTopic = (topic: FooterDocTopic) => {
+    setActiveDocTopic(topic);
+    setActiveView('docs');
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -237,9 +244,9 @@ function MainApp() {
         onOpenSimulate={() => setIsSimulateOpen(true)}
       />
 
-      {/* Main View Router: Landing Page vs. Deep Analysis Workspace */}
+      {/* Main View Router: Landing Page vs. Deep Analysis Workspace vs. Docs */}
       <main className="flex-1 w-full">
-        {activeView === 'landing' ? (
+        {activeView === 'landing' && (
           <>
             {/* 1. Hero Section */}
             <HeroSection
@@ -261,14 +268,23 @@ function MainApp() {
             {/* 5. Enterprise Pricing Section */}
             <PricingSection onOpenWorkspace={() => setActiveView('workspace')} />
           </>
-        ) : (
-          /* Dedicated Deep Analysis & Live Workspace Section */
+        )}
+
+        {activeView === 'workspace' && (
           <WorkspaceSection
             tickets={tickets}
             onSelectTicket={setSelectedTicket}
             onApproveTicket={handleApproveTicket}
             onRejectTicket={handleRejectTicket}
             onOpenSimulate={() => setIsSimulateOpen(true)}
+          />
+        )}
+
+        {activeView === 'docs' && (
+          <FooterDocPage
+            initialTopic={activeDocTopic}
+            onBackToLanding={() => setActiveView('landing')}
+            onOpenWorkspace={() => setActiveView('workspace')}
           />
         )}
       </main>
@@ -289,7 +305,10 @@ function MainApp() {
       />
 
       {/* Comprehensive Enterprise Footer */}
-      <Footer onOpenWorkspace={() => setActiveView('workspace')} />
+      <Footer
+        onOpenWorkspace={() => setActiveView('workspace')}
+        onOpenDocTopic={handleOpenDocTopic}
+      />
     </div>
   );
 }
