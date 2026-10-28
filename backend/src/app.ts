@@ -14,9 +14,10 @@ export function createApp() {
   // 1. Security Headers
   app.use(helmet());
 
-  // 2. CORS allowlist (supports localhost, 127.0.0.1, and server-to-server webhooks)
+  // 2. CORS allowlist (supports localhost, deployed previews, and server-to-server webhooks)
+  const configuredOrigins = config.CORS_ORIGIN.split(',').map((s) => s.trim());
   const allowedOrigins = new Set([
-    config.CORS_ORIGIN,
+    ...configuredOrigins,
     'http://localhost:5173',
     'http://127.0.0.1:5173',
   ]);
@@ -25,7 +26,17 @@ export function createApp() {
     cors({
       origin: (origin, callback) => {
         // Allow requests with no origin (curl, server-to-server webhooks)
-        if (!origin || allowedOrigins.has(origin)) {
+        if (!origin) return callback(null, true);
+        // Allow wildcards or exact match
+        if (config.CORS_ORIGIN === '*' || allowedOrigins.has(origin)) {
+          return callback(null, true);
+        }
+        // Allow common deployment preview domains (Vercel, Render, Netlify)
+        if (
+          origin.endsWith('.vercel.app') ||
+          origin.endsWith('.onrender.com') ||
+          origin.endsWith('.netlify.app')
+        ) {
           return callback(null, true);
         }
         return callback(new Error(`CORS origin ${origin} not permitted`));
