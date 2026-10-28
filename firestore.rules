@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// SECURITY ARCHITECTURE NOTE:
+// All client applications (React Dashboard, integrations, mobile apps) are strictly
+// FORBIDDEN from reading or writing to Firestore directly.
+//
+// All operations MUST pass through the backend Express API, which uses the Firebase Admin SDK.
+// The Firebase Admin SDK bypasses security rules because it acts as a privileged system actor.
+//
+// By denying all direct client access here, we eliminate an entire class of security vulnerabilities
+// (unauthorized queries, tampered data, bypassed business logic, and exposed API keys).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

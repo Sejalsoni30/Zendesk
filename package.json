@@ -1,0 +1,34 @@
+{
+  "name": "zendesk-darwinbox-box-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise-grade employee support workflow automation across Zendesk, Darwinbox, and Box",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "test:backend": "npm --prefix backend run test",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "seed": "npm --prefix backend run seed",
+    "emulators": "cross-env JAVA_HOME=\"C:\\Users\\COMPUTER HOUSE\\.tools\\jre17\" PATH=\"C:\\Users\\COMPUTER HOUSE\\.tools\\jre17\\bin;%PATH%\" firebase emulators:start --only firestore,auth"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "firebase-tools": "^13.34.0"
+  },
+  "keywords": [
+    "zendesk",
+    "darwinbox",
+    "box",
+    "automation",
+    "workflow",
+    "firebase",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC"
+}
+

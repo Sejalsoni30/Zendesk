@@ -1,0 +1,25 @@
+import { Request, Response } from 'express';
+import { config } from '../config/env.js';
+import { checkFirestoreConnection } from '../config/firebase.js';
+
+export async function getHealth(_req: Request, res: Response): Promise<void> {
+  const isFirestoreConnected = await checkFirestoreConnection();
+
+  const status = isFirestoreConnected ? 'healthy' : 'degraded';
+
+  res.status(isFirestoreConnected ? 200 : 503).json({
+    status,
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    environment: config.NODE_ENV,
+    mockMode: config.USE_MOCK_SERVICES,
+    services: {
+      firestore: isFirestoreConnected ? 'connected' : 'disconnected',
+      zendesk: config.USE_MOCK_SERVICES ? 'mock' : 'real',
+      darwinbox: config.USE_MOCK_SERVICES ? 'mock' : 'real',
+      box: config.USE_MOCK_SERVICES ? 'mock' : 'real',
+    },
+    version: '1.0.0',
+  });
+}
+
