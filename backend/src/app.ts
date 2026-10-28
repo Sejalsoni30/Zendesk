@@ -56,7 +56,7 @@ export function createApp() {
   app.use(
     express.json({
       limit: '2mb',
-      verify: (req: any, _res, buf) => {
+      verify: (req: any, _res: any, buf: Buffer) => {
         // Preserve raw buffer for webhook signature validation
         req.rawBody = buf;
       },
@@ -77,7 +77,7 @@ export function createApp() {
   app.use(`${config.API_PREFIX}/workflows`, workflowRoutes);
 
   // Root fallback
-  app.get('/', (_req, res) => {
+  app.get('/', (_req: express.Request, res: express.Response) => {
     res.json({
       message: 'Zendesk–Darwinbox–Box Automation API',
       documentation: `${config.API_PREFIX}/health`,
